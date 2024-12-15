@@ -59,7 +59,7 @@ class OpenAIService:
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=messages,
-            max_token=500
+            max_tokens=200
         )
 
         content = response.choices[0].message.content
