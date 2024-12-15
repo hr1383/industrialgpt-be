@@ -12,7 +12,7 @@ class Messages(BaseModel):
 
 class ChatRequest(BaseModel):
     # user_id: str
-    chat_id: Optional[str]
+    chat_id: Optional[str] = None
     message: str
 
 class ChatResponse(BaseModel):

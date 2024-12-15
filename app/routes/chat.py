@@ -55,7 +55,7 @@ def chat(user_id:str, chat_id: str):
     print(history)
     return history
 
-@router.get("/users/{user_id}/chats}")
+@router.get("/users/{user_id}/chats")
 def chat(user_id:str):
     history = redis_service.get_chat_ids(user_id, 0)
     print(history)

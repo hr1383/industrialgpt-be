@@ -5,7 +5,6 @@ from app.config import settings
 from mangum import Mangum
 
 app = FastAPI(title="ChatBot API")
-handler = Mangum(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
