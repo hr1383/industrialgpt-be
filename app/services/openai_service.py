@@ -61,7 +61,7 @@ class OpenAIService:
             messages=messages,
             max_tokens=200
         )
-
+        print(response)
         content = response.choices[0].message.content
         content = content.replace("\n\n", "\n")
         content = content.replace("**", "")
