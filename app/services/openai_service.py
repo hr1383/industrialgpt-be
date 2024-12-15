@@ -34,7 +34,7 @@ class OpenAIService:
         # Add chat history if available
 
         # my_prompt = "You are a Sales Agent and need to gather information from the customer. Answer the user question based on previous context. The answer is a sms message, so it needs to be brief and clear. Once you have the details, notify then by thanking to reach out and we will get back to them : " + prompt
-        my_prompt = "I am a Sale procurement analyst in a hardware company and looking to get more information. Add a newline character for new paragraphs or if answer contains number 1,2,3 to render new line on a web page.Question:" + prompt
+        my_prompt = "I am a Sale procurement analyst in a hardware company and looking to get more information. Add a newline character for new paragraphs or if answer contains number 1,2,3 to render new line on a web page. Also replace ** with stand and end of bold html tag.Question:" + prompt
         if history:
             # print("history length", len(history))
             for msg in history:
@@ -62,5 +62,5 @@ class OpenAIService:
         )
         content = response.choices[0].message.content
         content = content.replace("\n\n", "\n")
-        content = content.replace("**", "<b>")
+        # content = content.replace("**", "<b>")
         return content
