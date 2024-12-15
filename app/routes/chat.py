@@ -20,7 +20,7 @@ def chat(user_id:str, request: ChatRequest):
 
         # Get response from OpenAI
         response = openai_service.get_chat_response(request.message, history)
-        print ("AI " + response)
+        # print ("AI " + response)
         # Generate message ID using timestamp
 
         timestamp = datetime.utcnow().isoformat()
