@@ -18,3 +18,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     response: str
     chat_id: str
+
+class ChatResponseV2(BaseModel):
+    response: dict
+    chat_id: str

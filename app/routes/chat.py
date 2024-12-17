@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
-import uuid
+import uuid, json
 from app.models import ChatRequest, ChatResponse, Message, Messages
 from app.services.redis_service import RedisService
 from app.services.openai_service import OpenAIService
@@ -52,12 +52,13 @@ def chat(user_id:str, request: ChatRequest):
 @router.get("/users/{user_id}/chat/{chat_id}")
 def chat(user_id:str, chat_id: str):
     history = redis_service.get_chat_history(user_id, chat_id, 0)
-    print(history)
-    return history
+    result = []
+    for m in history:
+        result.append(json.loads(m))
+    return result
 
 @router.get("/users/{user_id}/chats")
 def chat(user_id:str):
     history = redis_service.get_chat_ids(user_id, 0)
-    print(history)
     return history
 

@@ -1,16 +1,18 @@
 import json
 from typing import List
 import redis
-from app.models import Message
+from app.models import Message, ChatResponseV2
 from app.config import settings
 import time
 import json
+
+
 class RedisService:
     def __init__(self):
-        self.redis_client =redis.StrictRedis(host=settings.REDIS_URL, port=6379)
-            # redis.from_url(settings.REDIS_URL, decode_responses=True)
+        self.redis_client = redis.StrictRedis(host=settings.REDIS_URL, port=6379)
+        # redis.from_url(settings.REDIS_URL, decode_responses=True)
 
-    def chat_key(self,user_id, chat_id):
+    def chat_key(self, user_id, chat_id):
         return f"{user_id}:chat:{chat_id}:messages"
 
     def save_message(self, user_id: str, chat_id: str, message: Message):
@@ -18,19 +20,18 @@ class RedisService:
         # self.redis_client.set(key, message.json())
         timestamp = time.time()  # Current timestamp in seconds
         # Key for storing messages
-        redis_key = self.chat_key(user_id,chat_id)
+        redis_key = self.chat_key(user_id, chat_id)
         # Add the message to the sorted set with the timestamp as the score
-        print(redis_key)
-        print("storing" + message.json())
+        # print("storing" + message.json())
         self.redis_client.zadd(redis_key, {message.json(): timestamp})
 
-    def get_chat_history(self, user_id: str,message_id, start, limit: int = 5) -> List[Message]:
+    def get_chat_history(self, user_id: str, message_id, start, limit: int = 5) -> List[Message]:
         # Get all keys for the user
         redis_key = self.chat_key(user_id, message_id)
         # Retrieve messages sorted by timestamp
-        return self.redis_client.zrange(redis_key, start, start+limit)
+        return self.redis_client.zrange(redis_key, start, start + limit)
 
-    def get_chat_ids(self, user_id, start,limit:int = 5) -> List[Message]:
+    def get_chat_ids(self, user_id, start, limit: int = 5) -> List[Message]:
         # Get all keys for the user
         pattern = f"{user_id}:chat:*:messages"
         chat_ids = []
@@ -42,8 +43,10 @@ class RedisService:
             for key in keys:
                 # Extract the chat_id from the key
                 parts = key.decode('utf-8').split(':')
-                print(parts)
-                chat_ids.append(parts[2])  # Extract chat_id from the key
+                content = self.redis_client.zrange(key, 0, 0)
+                result = json.loads(content[0].decode('utf-8'))
+                result["chat_id"] = parts[2]
+                chat_ids.append(result) # Extract chat_id from the key
             if cursor == 0:
                 break
         print(chat_ids)
