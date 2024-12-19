@@ -38,7 +38,7 @@ class OpenAIService:
         if history:
             # print("history length", len(history))
             for msg in history:
-                print(msg)
+                 # print(msg)
                 message = Message.parse_raw(msg)
                 messages.append({
                     "role": message.role,
@@ -46,16 +46,17 @@ class OpenAIService:
                 })
 
         # Add current prompt
-        # if history:
-        messages.append({
+        if history:
+            messages.append({
             "role": "user",
             "content": my_prompt
         })
-        # else:
-        #     messages.append({
-        #         "role": "user",
-        #         "content": start_prompt
-        #     })
+        else:
+            messages.append({
+                "role": "user",
+                "content": my_prompt
+            })
+        # print (messages)
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=messages,

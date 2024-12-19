@@ -51,7 +51,7 @@ def chat(user_id:str, request: ChatRequest):
 
 @router.get("/users/{user_id}/chat/{chat_id}")
 def chat(user_id:str, chat_id: str):
-    history = redis_service.get_chat_history(user_id, chat_id, 0)
+    history = redis_service.get_chat_history(user_id, chat_id, 0,50)
     result = []
     for m in history:
         result.append(json.loads(m))
