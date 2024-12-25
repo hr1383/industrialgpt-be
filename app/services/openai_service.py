@@ -46,17 +46,11 @@ class OpenAIService:
                 })
 
         # Add current prompt
-        if history:
-            messages.append({
+        messages.append({
             "role": "user",
             "content": my_prompt
         })
-        else:
-            messages.append({
-                "role": "user",
-                "content": my_prompt
-            })
-        # print (messages)
+        print (messages)
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=messages,
