@@ -1,8 +1,3 @@
-import json
-
-
-
-
 def get_email_text(result):
     messages = (result['message']['artifact']['messages'])
     text = "Here is a transcript of the call \n"

@@ -1,7 +1,6 @@
 from app.config import settings
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
-from app.utils import get_email_text
 
 
 api_key = settings.SENDGRID_API_KEY
