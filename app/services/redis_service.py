@@ -15,7 +15,7 @@ class RedisService:
     def chat_key(self, user_id, chat_id):
         return f"{user_id}:chat:{chat_id}:messages"
 
-    def save_message(self, user_id: str, chat_id: str, message: Message):
+    def save_message(self, user_id: str, chat_id: str, message: Message, isNew: bool = False):
         # key = f"{user_id}:{message_id}"
         # self.redis_client.set(key, message.json())
         timestamp = time.time()  # Current timestamp in seconds
@@ -23,6 +23,8 @@ class RedisService:
         redis_key = self.chat_key(user_id, chat_id)
         # Add the message to the sorted set with the timestamp as the score
         # print("storing" + message.json())
+        if isNew:
+            self.redis_client.rpush(user_id, chat_id)
         self.redis_client.zadd(redis_key, {message.json(): timestamp})
 
     def get_chat_history(self, user_id: str, message_id, start, limit: int = 5) -> List[Message]:
@@ -33,22 +35,7 @@ class RedisService:
 
     def get_chat_ids(self, user_id, start, limit: int = 5) -> List[Message]:
         # Get all keys for the user
-        pattern = f"{user_id}:chat:*:messages"
-        chat_ids = []
-        cursor = 0
-
-        # Use SCAN to find all keys matching the pattern
-        while True:
-            cursor, keys = self.redis_client.scan(cursor=cursor, match=pattern)
-            for key in keys:
-                # Extract the chat_id from the key
-                parts = key.decode('utf-8').split(':')
-                content = self.redis_client.zrange(key, 0, 0)
-                result = json.loads(content[0].decode('utf-8'))
-                result["chat_id"] = parts[2]
-                chat_ids.append(result) # Extract chat_id from the key
-            if cursor == 0:
-                break
+        chat_ids = self.redis_client.lrange(user_id, 0, -1)
         print(chat_ids)
         return chat_ids
 

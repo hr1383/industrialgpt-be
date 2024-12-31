@@ -12,7 +12,7 @@ redis_service = RedisService()
 openai_service = OpenAIService()
 email_service = EmailService()
 
-def save_chat(chat_id, user_message, user_id):
+def save_chat(chat_id, user_message, user_id, is_new: bool):
     history = redis_service.get_chat_history(user_id, chat_id, 0)
     # Get response from OpenAI
     response = openai_service.get_chat_response(user_message, history)
@@ -25,7 +25,7 @@ def save_chat(chat_id, user_message, user_id):
         role="user",
         timestamp=timestamp
     )
-    redis_service.save_message(user_id, f"{chat_id}", user_message_obj)
+    redis_service.save_message(user_id, f"{chat_id}", user_message_obj, is_new)
     # Save assistant response
     assistant_message = Message(
         content=response,
@@ -40,7 +40,7 @@ def save_chat(chat_id, user_message, user_id):
 def chat(user_id: str, request: ChatRequest):
     # try:
     chat_id = uuid.uuid4().__str__()
-    response = save_chat(chat_id, request.message, user_id)
+    response = save_chat(chat_id, request.message, user_id, True)
     return ChatResponse(
         response=response,
         chat_id=chat_id
@@ -49,7 +49,7 @@ def chat(user_id: str, request: ChatRequest):
 
 @router.post("/users/{user_id}/chat/{chat_id}", response_model=ChatResponse)
 def chat(user_id: str, chat_id:str, request: ChatRequest):
-    response = save_chat(chat_id, request.message, user_id)
+    response = save_chat(chat_id, request.message, user_id, False)
     return ChatResponse(
         response=response,
         chat_id=chat_id
