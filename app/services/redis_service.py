@@ -33,28 +33,25 @@ class RedisService:
         # Retrieve messages sorted by timestamp
         return self.redis_client.zrange(redis_key, start, start + limit)
 
-    def get_chat_ids(self, user_id, start, limit: int = 5) -> List[Message]:
+    def get_chat_ids(self, user_id, start, limit: int = 100) -> List[Message]:
         # Get all keys for the user
         chat_ids = self.redis_client.lrange(user_id, 0, -1)
         print(chat_ids)
-        return chat_ids
+        result = []
+        for chat_id in chat_ids:
+            key = f"{user_id}:chat:{chat_id.decode('utf-8')}:messages"
+            print(key)    
+            oldest_messages = self.redis_client.zrange(key, 0, 0)
+            if oldest_messages:
+                message = Message.parse_raw(oldest_messages[0])
+                result.append({
+                    'id': chat_id,
+                    'message': message.content[:50],
+                    'timestamp': message.timestamp
+                })
+        return result
 
-    def get_chat_ids_for_user(self, user_id):
-        pattern = f"{user_id}:chat:*:messages"
-        chat_ids = []
-        cursor = 0
-
-        # Use SCAN to find all keys matching the pattern
-        while True:
-            cursor, keys = self.redis_client.scan(cursor=cursor, match=pattern)
-            for key in keys:
-                # Extract the chat_id from the key
-                parts = key.decode('utf-8').split(':')
-                chat_ids.append(parts[3])  # Extract chat_id from the key
-            if cursor == 0:
-                break
-
-        return chat_ids
+   
 
     # Example Usage
     # user_id = "user1"
